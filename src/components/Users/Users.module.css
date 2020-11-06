@@ -1,0 +1,18 @@
+.loader {
+    width: 100px;
+    margin: 0 auto;
+}
+
+.user {
+    display: grid;
+    grid-template-areas: "i d";
+    grid-template-columns: 100px calc(100% - 100px);
+}
+
+.imgBlock {
+    grid-area: i;
+}
+
+.description {
+    grid-area: d;
+}

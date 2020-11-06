@@ -1,0 +1,22 @@
+.login {
+    width: 500px;
+    padding: 55px;
+    background: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 3px 20px 0px rgba(0, 0, 0, 0.1);
+}
+
+.button {
+    border-radius: 0;
+    padding: 10px;
+    display: block;
+}
+
+.captchaImg {
+    display: block;
+}
+
+.error {
+    color: red;
+}
