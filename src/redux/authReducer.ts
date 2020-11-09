@@ -2,10 +2,10 @@ import {api} from "../api/api";
 import {stopSubmit} from "redux-form";
 import {BaseThunkType} from "./reduxStore";
 import {LoginFormDataType} from "../common/types";
+import {FormikHelpers} from "formik";
 
 const SET_USER_DATA = 'authReducer/SET_USER_DATA';
 const LOGOUT = 'authReducer/LOGOUT';
-const SET_LOGIN_LOADING = 'authReducer/SET-LOGIN-LOADING';
 const SET_CAPTCHA_URL = 'authReducer/SET_CAPTCHA_URL';
 
 type userType = {
@@ -33,7 +33,7 @@ let initialState:initialStateType = {
     initialized: false
 };
 
-type ActionsType = setUserDataType | setLoginLoadingType | logoutType | setCaptchaUrlType
+type ActionsType = setUserDataType | logoutType | setCaptchaUrlType
 let authReducer = (state = initialState, action:ActionsType):initialStateType => {
     switch(action.type) {
         case SET_USER_DATA:
@@ -57,11 +57,6 @@ let authReducer = (state = initialState, action:ActionsType):initialStateType =>
                 },
                 isAuth: false
             }
-        case SET_LOGIN_LOADING:
-            return {
-                ...state,
-                isLoading: action.isLoading
-            }
         case SET_CAPTCHA_URL:
             return {
                 ...state,
@@ -82,12 +77,6 @@ type setUserDataType = {
 }
 let setUserData = (userId:number | null, email:string | null, login:string | null):setUserDataType => ({type: SET_USER_DATA, userId: userId, email: email, login: login});
 
-type setLoginLoadingType = {
-    type: typeof SET_LOGIN_LOADING
-    isLoading: boolean
-}
-let setLoginLoading = (isLoading:boolean):setLoginLoadingType => ({type: SET_LOGIN_LOADING, isLoading: isLoading});
-
 type logoutType = {
     type: typeof LOGOUT
 }
@@ -99,14 +88,14 @@ type setCaptchaUrlType = {
 }
 let setCaptchaUrl = (captchaUrl:string):setCaptchaUrlType => ({type: SET_CAPTCHA_URL, captchaUrl: captchaUrl});
 
-export let loginThunkCreator = (formData: LoginFormDataType):ThunkType => async (dispatch) => {
-    dispatch(setLoginLoading(true))
+export let loginThunkCreator = (formData: LoginFormDataType, actions: FormikHelpers<LoginFormDataType>):ThunkType => async (dispatch) => {
+    actions.setSubmitting(true)
     const responce = await api.authAPI.login(formData)
-    dispatch(setLoginLoading(false))
-    debugger
+    actions.setSubmitting(false)
     if(0 === responce.resultCode) {
         dispatch(setUserData(responce.data.userId, formData.email, 'test'))
     } else {
+        actions.setErrors({email: responce.messages[0]})
         //console.log();
         if(10 === responce.resultCode) {
             const responceCaptcha = await api.sequrity.getCaptcha()

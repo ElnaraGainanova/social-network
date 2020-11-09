@@ -2,26 +2,25 @@ import React from "react"
 import s from './Login.module.css'
 import {emailValidation, required} from "../../common/form/validators"
 import {LoginFormDataType} from "../../common/types"
-import {Field, Formik} from "formik"
+import {Field, Formik, FormikHelpers, FormikProps} from "formik"
 import {Form, Input, SubmitButton} from 'formik-antd'
 import {useDispatch, useSelector} from "react-redux"
 import {getCaptchaUrl} from "../../redux/auth-selectors";
-import { loginThunkCreator } from "../../redux/authReducer"
+import {loginThunkCreator} from "../../redux/authReducer"
 
 type OwnPropsType = {
-    email: string
-    password: string
-    rememberMe: boolean
     captchaUrl: string | undefined
-    onSubmit: (data:LoginFormDataType) => void
+    onSubmit: (data:LoginFormDataType, actions: FormikHelpers<LoginFormDataType>) => void
 }
-let FormLogin:React.FC<LoginFormDataType & OwnPropsType> = ({onSubmit, ...props}) => {
+
+let FormLogin:React.FC<OwnPropsType> = ({onSubmit, ...props}) => {
     const initialValues: LoginFormDataType = {
         captchaUrl: undefined,
         email: '',
         password: '',
         rememberMe: false
     }
+
     return (
         <Formik initialValues={initialValues} onSubmit={onSubmit}>
             <Form>
@@ -37,16 +36,20 @@ let FormLogin:React.FC<LoginFormDataType & OwnPropsType> = ({onSubmit, ...props}
 }
 
 type LoginType = {}
+type ActionsType = {
+    setSubmitting: (v: boolean) => void
+    setErrors: (v: Array<string>) => void
+}
 let Login: React.FC<LoginType> = (props) => {
     const dispatch = useDispatch()
     const captchaUrl = useSelector(getCaptchaUrl)
-    let login = (data:LoginFormDataType) => {
-        dispatch(loginThunkCreator(data))
+    let login = (data:LoginFormDataType, actions: FormikHelpers<LoginFormDataType>) => {
+        dispatch(loginThunkCreator(data, actions))
     }
 
     return (
         <div className={s.login}>
-            <FormLogin onSubmit={login} captchaUrl={captchaUrl} email={''} password={''} rememberMe={false}></FormLogin>
+            <FormLogin onSubmit={login} captchaUrl={captchaUrl}></FormLogin>
         </div>
     );
 }
